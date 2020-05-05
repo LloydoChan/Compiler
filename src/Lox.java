@@ -1,3 +1,4 @@
+package CraftingInterpreters;
 
 import java.io.BufferedReader;
 import java.io.IOError;
@@ -7,7 +8,9 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Scanner;
+
+import CraftingInterpreters.Scanner;
+import CraftingInterpreters.Token;
 
 public class Lox {
 
