@@ -1,7 +1,7 @@
 package CraftingInterpreters;
 
 import java.util.List;
-import CraftingInterpreters.Token;
+import CraftingInterpreters.Token.*;
 
 abstract class Expr {
     interface Visitor<R> {
