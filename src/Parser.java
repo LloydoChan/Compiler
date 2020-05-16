@@ -5,13 +5,23 @@ import static CraftingInterpreters.TokenType.*;
 import CraftingInterpreters.TokenType;
 import CraftingInterpreters.Token;
 import CraftingInterpreters.Expr;
+import CraftingInterpreters.Lox;
 
 public class Parser {
+    private static class ParseError extends RuntimeException { }
     private final List<Token> tokens;
     private int current = 0;
 
     Parser(List<Token> tokens){
         this.tokens = tokens;
+    }
+
+    Expr parse() {
+        try {
+            return expression();
+        }catch(ParseError error){
+            return null;
+        }
     }
 
     private Expr expression() {
@@ -50,6 +60,8 @@ public class Parser {
             Expr right = multiplication();
             expr = new Expr.Binary(expr, operator, right);
         }
+
+        return expr;
     }
 
     private Expr multiplication() {
@@ -70,6 +82,8 @@ public class Parser {
             Expr right = unary();
             return new Expr.Unary(operator, right);
         }
+
+        return primary();
     }
 
     private Expr primary() {
@@ -86,6 +100,8 @@ public class Parser {
             consume(RIGHT_PAREN, "Expect ')' after expression. ");
             return new Expr.Grouping(expr);
         }
+
+        throw error(peek(), "Expect expression.");
     }
 
     private boolean match(CraftingInterpreters.TokenType... types){
@@ -105,7 +121,7 @@ public class Parser {
     }
 
     private Token advance(){
-        if (isAtEnd()) current++;
+        if (!isAtEnd()) current++;
         return previous();
     }
 
@@ -119,5 +135,37 @@ public class Parser {
 
     private Token previous() {
         return tokens.get(current - 1);
+    }
+
+    private Token consume(TokenType type, String message) {
+        if (check(type)) return advance();
+        throw error(peek(), message);
+    }
+
+    private ParseError error(Token token, String message) {
+        Lox.error(token, message);
+        return new ParseError();
+    }
+
+    private void synchronize(){
+        advance();
+
+        while(!isAtEnd()) {
+            if ( previous().type == SEMICOLON) return;
+
+            switch(peek().type) {
+                case CLASS:
+                case FUN:
+                case VAR:
+                case FOR:
+                case IF:
+                case WHILE:
+                case PRINT:
+                case RETURN:
+                    return;
+            }
+
+            advance();
+        }
     }
 }
