@@ -2,7 +2,6 @@ package CraftingInterpreters;
 
 import java.util.List;
 import static CraftingInterpreters.TokenType.*;
-import CraftingInterpreters.TokenType;
 import CraftingInterpreters.Token;
 import CraftingInterpreters.Expr;
 import CraftingInterpreters.Lox;
