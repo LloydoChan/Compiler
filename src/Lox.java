@@ -17,6 +17,7 @@ import CraftingInterpreters.Parser;
 import CraftingInterpreters.Expr;
 import CraftingInterpreters.RuntimeError;
 import CraftingInterpreters.Interpreter;
+import CraftingInterpreters.Stmt;
 
 public class Lox {
 
@@ -56,11 +57,11 @@ public class Lox {
         Scanner scanner = new Scanner(readLine);
         List<Token> tokens = scanner.scanTokens();
         Parser parser = new Parser(tokens);
-        Expr expression = parser.parse();
+        List<Stmt> statements = parser.parse();
 
         if(hadError) return;
 
-        interpreter.interpret(expression);
+        interpreter.interpret(statements);
     }
 
     private static void report(int line, String where, String message) {

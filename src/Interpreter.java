@@ -1,6 +1,9 @@
 package CraftingInterpreters;
 
+import java.util.List;
+
 import CraftingInterpreters.Expr;
+import CraftingInterpreters.Stmt;
 import CraftingInterpreters.Expr.Visitor;
 import CraftingInterpreters.Token.*;
 import static CraftingInterpreters.TokenType.*;
@@ -9,7 +12,7 @@ import CraftingInterpreters.Lox;
 import CraftingInterpreters.RuntimeError;
 
 
-public class Interpreter implements Expr.Visitor<Object> {
+public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     @Override
     public Object visitLiteralExpr(Expr.Literal expr) {
         return expr.value;
@@ -110,6 +113,19 @@ public class Interpreter implements Expr.Visitor<Object> {
         return expr.accept(this);
     }
 
+    @Override
+    public Void visitExpressionStmt(Stmt.Expression stmt) {
+        evaluate(stmt.expression);
+        return null;
+    }
+
+    @Override
+    public Void visitPrintStmt(Stmt.Print stmt) {
+        Object value = evaluate(stmt.expression);
+        System.out.println(stringify(value));
+        return null;
+    }
+
     // error checking and runtime error stuff goes here
     private void checkNumberOperand(Token operator, Object operand) {
         if (operand instanceof Double) return;
@@ -126,13 +142,18 @@ public class Interpreter implements Expr.Visitor<Object> {
         throw new RuntimeError(operator, "attempted divide by zero");
     }
 
-    void interpret(Expr expression) {
+    void interpret(List<Stmt> statements) {
         try {
-            Object value = evaluate(expression);
-            System.out.println(stringify(value));
+            for (Stmt statement: statements) {
+                execute(statement);
+            }
         } catch (RuntimeError error) {
             Lox.runtimeError(error);
         }
+    }
+
+    private void execute(Stmt stmt){
+        stmt.accept(this);
     }
 
     private String stringify(Object object){

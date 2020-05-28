@@ -7,7 +7,7 @@ import java.util.List;
 
 public class GenerateAst {
     public static void main(String[] args) throws IOException {
-        if(args.length != 1) {
+        if (args.length != 1) {
             System.err.println("Usage: generate_ast <output directory");
             System.exit(64);
         }
@@ -18,6 +18,11 @@ public class GenerateAst {
                 "Grouping   : Expr expression",
                 "Literal    : Object value",
                 "Unary      : Token operator, Expr right"
+        ));
+
+        defineAst(outputDir, "Stmt", Arrays.asList(
+                "Expression : Expr expression",
+                "Print      : Expr expression"
         ));
     }
 
@@ -75,8 +80,6 @@ public class GenerateAst {
 
         writer.println("     }");
 
-
-
         writer.println();
         writer.println("    @Override");
         writer.println("    <R> R accept(Visitor<R> visitor) {");
@@ -84,11 +87,11 @@ public class GenerateAst {
                 className + baseName + "(this);");
         writer.println("    }");
 
-        writer.println("   }");
-
         writer.println();
         for(String field:fields){
             writer.println("    final " + field + ";");
         }
+
+        writer.println(" }");
     }
 }
